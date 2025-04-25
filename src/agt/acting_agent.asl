@@ -108,7 +108,6 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
 +!manifest_temperature
     :  temperature(Celsius) & robot_td(Location)
     <-  .print("I will manifest the temperature: ", Celsius);
-        makeArtifact("converter", "tools.Converter", [], ConverterId); // creates a converter artifact
         convert(Celsius, -20.00, 20.00, 200.00, 830.00, Degrees)[artifact_id(ConverterId)]; // converts Celsius to binary degrees based on the input scale
         .print("Temperature Manifesting (moving robotic arm to): ", Degrees);
 
