@@ -26,8 +26,10 @@ certified_reputation(certification_agent, sensing_agent_9, temperature(-2), -0.9
  * Body: greets the user
 */
 @start_plan
-+!start : true <-
-	.print("Hello world").
++!start
+    :  true
+    <-  .print("Hello world");
+    .
 
 /* 
  * Plan for reacting to the addition of the belief certified_reputation(CertificationAgent, InteractingAgent, MessageContent, CRRating)
@@ -35,8 +37,10 @@ certified_reputation(certification_agent, sensing_agent_9, temperature(-2), -0.9
  * Context: the agent believes that it is the CertificationAgent that created the certified reputation rating
  * Body: sends the certified reputation rating to the associated InteractingAgent
 */
-+certified_reputation(CertificationAgent, InteractingAgent, MessageContent, CRRating): .my_name(CertificationAgent) <-
-    .send(InteractingAgent, tell, certified_reputation(CertificationAgent, InteractingAgent, MessageContent, CRRating)).
++certified_reputation(CertificationAgent, InteractingAgent, MessageContent, CRRating)
+    :  .my_name(CertificationAgent)
+    <-  .send(InteractingAgent, tell, certified_reputation(CertificationAgent, InteractingAgent, MessageContent, CRRating));
+    .
 
 
 { include("$jacamoJar/templates/common-cartago.asl") }
