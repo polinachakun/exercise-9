@@ -39,11 +39,12 @@ This repository contains a partial implementation of a [JaCaMo](https://jacamo-l
 ```
 
 ## Task 1
-Modify the implementation in [`acting_agent.asl`](src/agt/acting_agent.asl) so that the acting agent manifests the temperature broadcasted by one of the agents with the highest avarage interaction trust rating.
+Modify the implementation in [`acting_agent.asl`](src/agt/acting_agent.asl) so that the acting agent manifests the temperature broadcasted by one of the agents with the highest average interaction trust rating.
 - HINTS:
   - You can see the structure of interaction trust ratings in [`interaction_trust_ratings.asl`](src/agt/inc/interaction_trust_ratings.asl). These ratings are already included in `acting_agent.asl` (through the command `include`).
-  - The [internal action `findall` of the jason.stdlib package](https://jason.sourceforge.net/api/jason/stdlib/findall.html) can be used to query the belief base for beliefs of a certain structure. 
-  - The [documentation of the jason.stdlib package](https://jason.sourceforge.net/api/jason/stdlib/package-summary.html) contains information about basic internal actions that can facilitate the computation of (highest) average interaction trust ratings (e.g. by handling lists). Alternatively, computation can be facilitated through the use of artifacts that can assist in the computation. 
+  - The [internal action `findall` of the jason.stdlib package](https://jason-lang.github.io/api/jason/stdlib/findall.html) can be used to query the belief base for beliefs of a certain structure. 
+  - The [documentation of the jason.stdlib package](https://jason-lang.github.io/api/jason/stdlib/package-summary.html) contains information about basic internal actions that can facilitate the computation of (highest) average interaction trust ratings (e.g. by handling lists). 
+    - Alternatively, computation can be facilitated through the use of artifacts that can assist in the computation. 
 The [CArtAgO By Example Guide](https://www.emse.fr/~boissier/enseignement/maop13/courses/cartagoByExamples.pdf) contains examples on how to create and use classes that extend the class `Artifact`of CArtAgO.
   - Currently, the plan `@select_reading_task_0_plan` is used in [`acting_agent.asl`](src/agt/acting_agent.asl) for selecting a random received temperature reading to manifest. For completing Task 1, you can either modify this plan, or create a new plan (and also create the relevant goal within the `@manifest_temperature_plan`).  
 
@@ -56,10 +57,13 @@ Modify the implementation in [`rogue_agent.asl`](src/agt/rogue_agent.asl) so tha
 ## Task 3
 Modify the implementations in [`sensing_agent.asl`](src/agt/sensing_agent.asl) and [`acting_agent.asl`](src/agt/acting_agent.asl) so that the acting agent asks all agents that have broadcasted a temperature reading for their certified reputation ratings. The acting agent should successfully receive the ratings, and manifest the temperature broadcasted by one of the agents with the highest rating (taking into consideration both certified reputation ratings and average interaction trust ratings).
 - HINTS: 
-  - The [`ask` illocutionary force](https://jason.sourceforge.net/api/jason/stdlib/send.html) can be used (also with the internal action `.broadcast`) to request from other agents information of a specified stucture (e.g. of the structure of certified reputation ratings).
+  - The [`ask` illocutionary force](https://jason-lang.github.io/api/jason/stdlib/send.html) can be used (also with the internal action `.broadcast`) to request from other agents information of a specified structure (e.g. of the structure of certified reputation ratings).
   
 ## Task 4
-- Modify the implementations in [`sensing_agent.asl`](src/agt/sensing_agent.asl), [`rogue_agent.asl`](src/agt/rogue_agent.asl), and [`rogue_leader_agent.asl`](src/agt/rogue_leader_agent.asl) so that the agents send witness reputation ratings (of their liking) to the acting agent.
+- Modify the implementations of the following agents so that the agents send witness reputation ratings (of their liking) to the acting agent:
+  - [`sensing_agent.asl`](src/agt/sensing_agent.asl)
+  - [`rogue_agent.asl`](src/agt/rogue_agent.asl)
+  - [`rogue_leader_agent.asl`](src/agt/rogue_leader_agent.asl) 
 - Modify the implementation in [`acting_agent.asl`](src/agt/acting_agent.asl) so that the agent successfully receives the ratings, and manifests the temperature broadcasted by one of the agents with the highest rating (taking into consideration certified reputation ratings, average interaction trust ratings, and average witness reputation ratings).
 
 ## How to run the project
@@ -84,8 +88,8 @@ The application uses by default the robotic arm on dry-run to manifest the tempe
 curl --location 'https://api.interactions.ics.unisg.ch/leubot1/v1.3.4/user' 
 --header 'Content-Type: application/json' 
 --data-raw '{
-    "name": "Danai V.",
-    "email": "danai.vachtsevanou@unisg.ch"
+    "name": "Fistname Lastname",
+    "email": "firstname.lastname@unisg.ch"
 }'
 ```
 - The response to the above request should return a response with a `Location` header, for example: `Location: https://api.interactions.ics.unisg.ch/leubot1/v1.3.4/user/7c41d146cfd74ce06577abc7f18c1187`. There `7c41d146cfd74ce06577abc7f18c1187` is your new API key. 

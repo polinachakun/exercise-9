@@ -5,7 +5,7 @@ org_name("lab_monitoring_org"). // the agent beliefs that it can manage organiza
 group_name("monitoring_team"). // the agent beliefs that it can manage groups with the id "monitoring_team"
 sch_name("monitoring_scheme"). // the agent beliefs that it can manage schemes with the id "monitoring_scheme"
 
-// infers whether a role R has not been adopted by a suffient number of agents in a group
+// infers whether a role R has not been adopted by a sufficient number of agents in a group
 has_enough_players_for(R,G) :-
   role_cardinality(R, Min, Max) &
   .count(play(_,R,G), NP) &

@@ -85,31 +85,31 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
     .
 
 /* 
- * Plan for reacting to the addition of the goal !select_reading(TempReadings, Celcius)
- * Triggering event: addition of goal !select_reading(TempReadings, Celcius)
+ * Plan for reacting to the addition of the goal !select_reading(TempReadings, Celsius)
+ * Triggering event: addition of goal !select_reading(TempReadings, Celsius)
  * Context: true (the plan is always applicable)
- * Body: unifies the variable Celcius with the 1st temperature reading from the list TempReadings
+ * Body: unifies the variable Celsius with the 1st temperature reading from the list TempReadings
 */
 @select_reading_task_0_plan
-+!select_reading(TempReadings, Celcius)
++!select_reading(TempReadings, Celsius)
     :  true
-    <-  .nth(0, TempReadings, Celcius);
+    <-  .nth(0, TempReadings, Celsius);
     .
 
 /* 
  * Plan for reacting to the addition of the goal !manifest_temperature
  * Triggering event: addition of goal !manifest_temperature
- * Context: the agent believes that there is a temperature in Celcius and
+ * Context: the agent believes that there is a temperature in Celsius and
  * that a WoT TD of an onto:PhantomX is located at Location
- * Body: converts the temperature from Celcius to binary degrees that are compatible with the 
+ * Body: converts the temperature from Celsius to binary degrees that are compatible with the 
  * movement of the robotic arm. Then, manifests the temperature with the robotic arm
 */
 @manifest_temperature_plan 
 +!manifest_temperature
-    :  temperature(Celcius) & robot_td(Location)
-    <-  .print("I will manifest the temperature: ", Celcius);
-        makeArtifact("covnerter", "tools.Converter", [], ConverterId); // creates a converter artifact
-        convert(Celcius, -20.00, 20.00, 200.00, 830.00, Degrees)[artifact_id(ConverterId)]; // converts Celcius to binary degress based on the input scale
+    :  temperature(Celsius) & robot_td(Location)
+    <-  .print("I will manifest the temperature: ", Celsius);
+        makeArtifact("converter", "tools.Converter", [], ConverterId); // creates a converter artifact
+        convert(Celsius, -20.00, 20.00, 200.00, 830.00, Degrees)[artifact_id(ConverterId)]; // converts Celsius to binary degrees based on the input scale
         .print("Temperature Manifesting (moving robotic arm to): ", Degrees);
 
         /* 

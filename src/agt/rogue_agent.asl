@@ -32,12 +32,12 @@ received_readings([]).
                 .random([0,1,2], SourceIndex);
                 .reverse(TempReadings, TempReadingsReversed);
                 .print("Received temperature readings: ", TempReadingsReversed);
-                .nth(SourceIndex, TempReadingsReversed, Celcius);
+                .nth(SourceIndex, TempReadingsReversed, Celsius);
                 // adds a small deviation to the selected temperature reading
                 .random(Deviation);
                 // broadcasts the temperature
-                .print("Read temperature (Celcius): ", Celcius + Deviation);
-                .broadcast(tell, temperature(Celcius + Deviation));
+                .print("Read temperature (Celsius): ", Celsius + Deviation);
+                .broadcast(tell, temperature(Celsius + Deviation));
             });
 
         // adds plan for reading temperature in case fewer than 3 readings have been received

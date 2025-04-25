@@ -36,9 +36,9 @@ i_have_plans_for(R) :- not (role_goal(R,G) & not has_plan_for(G)).
 +!read_temperature
     :  true
     <-  .print("Reading the temperature");
-        readCurrentTemperature(47.42, 9.37, Celcius); // reads the current temperature using the artifact
-        .print("Read temperature (Celcius): ", Celcius);
-        .broadcast(tell, temperature(Celcius)); // broadcasts the temperature reading
+        readCurrentTemperature(47.42, 9.37, Celsius); // reads the current temperature using the artifact
+        .print("Read temperature (Celsius): ", Celsius);
+        .broadcast(tell, temperature(Celsius)); // broadcasts the temperature reading
     .
 
 /* 
