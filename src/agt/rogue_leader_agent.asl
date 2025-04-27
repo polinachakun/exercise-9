@@ -18,12 +18,16 @@
         .remove_plan(LL2);
 
         // adds a new plan for always broadcasting the temperature -2
-        .add_plan({ +!read_temperature
-            :  true
-            <-  .print("Reading the temperature");
-                .print("Read temperature (Celcious): ", -2);
-                .broadcast(tell, temperature(-2));
-            }).
+        .add_plan(
+            {
+                +!read_temperature
+                    :   true
+                    <-  .print("Reading the temperature");
+                        .print("Read temperature (Celsius): ", -2);
+                        .broadcast(tell, temperature(-2));
+            }
+        );
+    .
 
 /* Import behavior of sensing agent */
 { include("sensing_agent.asl")}
