@@ -96,6 +96,73 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
     <-  .nth(0, TempReadings, Celsius);
     .
 
+
+@select_reading_task_1_plan
++!select_reading(TempReadings, Celsius)
+    : true
+       .findall(Agent, interaction_trust(acting_agent, Agent, _, _), AllAgents);
+       .sort(AllAgents, SortedAgents);
+       .union(SortedAgents, [], UniqueAgents);
+       
+       +highest_trust(-2, none);
+       
+       .print("Calculating average trust ratings for agents:");
+       
+       // For each agent, calculate average trust rating
+       for (.member(Agent, UniqueAgents)) {
+
+           .findall(Rating, interaction_trust(acting_agent, Agent, _, Rating), Ratings);
+           .length(Ratings, NumRatings);
+           
+           if (NumRatings > 0) {
+               +total(0);
+               for (.member(R, Ratings)) {
+                   ?total(Current);
+                   -+total(Current + R);
+               }
+               ?total(Total);
+               -total(_);
+               
+               AvgRating = Total / NumRatings;
+               
+               .print("Agent ", Agent, " has average trust rating: ", AvgRating);
+               
+               // Update if this is the highest average so far
+               ?highest_trust(CurrentBest, _);
+               if (AvgRating > CurrentBest) {
+                   -highest_trust(_, _);
+                   +highest_trust(AvgRating, Agent);
+               }
+           }
+       }
+       
+       // Get the agent with highest trust
+       ?highest_trust(HighestRating, BestAgent);
+       .print("Agent with highest average trust rating: ", BestAgent, " (", HighestRating, ")");
+       
+      
+       // Find position of BestAgent in the list of agents providing readings
+       .findall(Agent, available_reading(Agent, _), OrderedAgents);
+       .length(OrderedAgents, NumAgents);
+       
+       +agent_index(0);
+       
+       for (.range(I, 0, NumAgents-1)) {
+           .nth(I, OrderedAgents, CurrentAgent);
+           if (CurrentAgent == BestAgent) {
+               -+agent_index(I);
+               .print("Found trusted agent ", BestAgent, " at index ", I);
+           }
+       }
+       
+       ?agent_index(Index);
+       .nth(Index, TempReadings, Celsius);
+       .print("Selected temperature ", Celsius, " from most trusted agent ", BestAgent);
+       
+       -highest_trust(_, _);
+       -agent_index(_);
+    .
+
 /* 
  * Plan for reacting to the addition of the goal !manifest_temperature
  * Triggering event: addition of goal !manifest_temperature
