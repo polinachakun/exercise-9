@@ -101,6 +101,75 @@ i_have_plans_for(R) :- not (role_goal(R,G) & not has_plan_for(G)).
        }
     .
 
++?witness_reputation(WitnessAgent, TargetAgent, MessageContent, WRRating)
+    : true
+    <- .my_name(Me);
+       // Honest sensing agents (sensing_agent_1 to sensing_agent_4) give:
+       // - High ratings (0.9) to other honest agents (1-4)
+       // - Low ratings (-0.7) to rogue agents (5-8) and rogue leader (9)
+       
+       if (Me == sensing_agent_1 | Me == sensing_agent_2 | Me == sensing_agent_3 | Me == sensing_agent_4) {
+          
+           for (.range(I, 1, 4)) {
+               .concat("sensing_agent_", I, AgentName);
+               if (AgentName \== Me) {
+                   +witness_reputation(Me, AgentName, temperature(16), 0.9);
+               }
+           }
+           
+           for (.range(I, 5, 9)) {
+               .concat("sensing_agent_", I, AgentName);
+               +witness_reputation(Me, AgentName, temperature(-2), -0.7);
+           }
+       }
+       
+       .findall(witness_reputation(WA, TA, MC, WR), 
+               witness_reputation(WA, TA, MC, WR), 
+               AllWRs);
+       
+       .print("Sending witness reputation ratings: ", AllWRs);
+       
+       if (.empty(AllWRs)) {
+           .print("No witness ratings to send.");
+           .send(acting_agent, tell, []);
+       } else {
+           .send(acting_agent, tell, AllWRs);
+       }
+       
+       .abolish(witness_reputation(_,_,_,_));
+    .
+
+
++!kqml_received(Sender, ask, witness_reputation(WitnessAgent, TargetAgent, MessageContent, WRRating), MsgId)
+    : true
+    <- .my_name(Me);
+       if (Me == sensing_agent_1 | Me == sensing_agent_2 | Me == sensing_agent_3 | Me == sensing_agent_4) {
+        
+           for (.range(I, 1, 4)) {
+               .concat("sensing_agent_", I, AgentName);
+               if (AgentName \== Me) {
+                   +witness_reputation(Me, AgentName, temperature(16), 0.9);
+               }
+           }
+           
+           for (.range(I, 5, 9)) {
+               .concat("sensing_agent_", I, AgentName);
+               +witness_reputation(Me, AgentName, temperature(-2), -0.7);
+           }
+       }
+       
+       .findall(witness_reputation(WA, TA, MC, WR), 
+               witness_reputation(WA, TA, MC, WR), 
+               AllWRs);
+       
+       .print("Sending witness reputation ratings: ", AllWRs);
+       
+       for (.member(WRFact, AllWRs)) {
+           .send(Sender, tell, WRFact);
+       }
+       
+       .abolish(witness_reputation(_,_,_,_));
+    .
 /* 
  * Plan for reacting to the addition of the certified_reputation(CertificationAgent, SourceAgent, MessageContent, CRRating)
  * Triggering event: addition of belief certified_reputation(CertificationAgent, SourceAgent, MessageContent, CRRating)

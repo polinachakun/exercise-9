@@ -36,5 +36,94 @@ received_readings([]).
                     });
         .
 
++?witness_reputation(WitnessAgent, TargetAgent, MessageContent, WRRating)
+    : true
+    <- .my_name(Me);
+       // Rogue agents (sensing_agent_5 to sensing_agent_8) give:
+       // - High ratings (0.9) to other rogue agents (5-8) and rogue leader (9)
+       // - Low ratings (-0.7) to honest agents (1-4)
+       
+       if (Me == sensing_agent_5 | Me == sensing_agent_6 | Me == sensing_agent_7 | Me == sensing_agent_8) {
+           for (.range(I, 1, 4)) {
+               .concat("sensing_agent_", I, AgentName);
+               +witness_reputation(Me, AgentName, temperature(16), -0.7);
+           }
+           
+           for (.range(I, 5, 9)) {
+               .concat("sensing_agent_", I, AgentName);
+               if (AgentName \== Me) {
+                   +witness_reputation(Me, AgentName, temperature(-2), 0.9);
+               }
+           }
+       }
+       
+       .findall(witness_reputation(WA, TA, MC, WR), 
+               witness_reputation(WA, TA, MC, WR), 
+               AllWRs);
+       
+       .print("Sending witness reputation ratings: ", AllWRs);
+       
+
+       for (.member(WRFact, AllWRs)) {
+           .send(acting_agent, tell, WRFact);
+       }
+
+       
+       .abolish(witness_reputation(_,_,_,_));
+    .
++!kqml_received(Sender, ask, witness_reputation(WitnessAgent, TargetAgent, MessageContent, WRRating), MsgId)
+    : true
+    <- .my_name(Me);
+       for (.range(I, 1, 4)) {
+           .concat("sensing_agent_", I, AgentName);
+           +witness_reputation(Me, AgentName, temperature(16), -0.7);
+       }
+       
+       for (.range(I, 5, 9)) {
+           .concat("sensing_agent_", I, AgentName);
+           if (AgentName \== Me) {
+               +witness_reputation(Me, AgentName, temperature(-2), 0.9);
+           }
+       }
+       
+       .findall(witness_reputation(WA, TA, MC, WR), 
+               witness_reputation(WA, TA, MC, WR), 
+               AllWRs);
+       
+       .print("Sending witness reputation ratings: ", AllWRs);
+       
+       for (.member(WRFact, AllWRs)) {
+           .send(Sender, tell, WRFact);
+       }
+       
+       .abolish(witness_reputation(_,_,_,_));
+    .
+
++!kqml_received(Sender, ask, witness_reputation(WitnessAgent, TargetAgent, MessageContent, WRRating), MsgId)
+    : true
+    <- .my_name(Me);
+      
+       for (.range(I, 1, 4)) {
+           .concat("sensing_agent_", I, AgentName);
+           +witness_reputation(Me, AgentName, temperature(16), -1.0);
+       }
+       
+       for (.range(I, 5, 8)) {
+           .concat("sensing_agent_", I, AgentName);
+           +witness_reputation(Me, AgentName, temperature(-2), 1.0);
+       }
+       
+       .findall(witness_reputation(WA, TA, MC, WR), 
+               witness_reputation(WA, TA, MC, WR), 
+               AllWRs);
+       
+       .print("Sending witness reputation ratings: ", AllWRs);
+
+       for (.member(WRFact, AllWRs)) {
+           .send(Sender, tell, WRFact);
+       }
+       
+       .abolish(witness_reputation(_,_,_,_));
+    .
 /* Import behavior of sensing agent */
 { include("sensing_agent.asl")}
