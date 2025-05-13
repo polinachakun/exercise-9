@@ -163,6 +163,111 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
        -agent_index(_);
     .
 
+@select_reading_task_3_plan
++!select_reading(TempReadings, Celsius)
+    : true
+    <-  .print("Requesting certified reputation ratings from temperature readers...");
+      
+       .findall(Agent, plays(Agent, temperature_reader, _), TemperatureReaders);
+       .print("Temperature readers: ", TemperatureReaders);
+       
+       // Ask all temperature readers for their certified reputation ratings
+       .broadcast(ask, certified_reputation(CertificationAgent, TargetAgent, MessageContent, CRRating));
+       
+       .wait(1000);
+       
+       // Calculate average IT ratings for each agent
+       .findall(Agent, interaction_trust(acting_agent, Agent, _, _), AllAgents);
+       .sort(AllAgents, SortedAgents);
+       .union(SortedAgents, [], UniqueAgents);
+       
+       .print("Calculating combined ratings (IT_CR) for temperature readers...");
+       
+       // Initialize best agent and best rating
+       +best_agent(none, -2);
+       
+       // For each agent, calculate average IT and average CR, then combined IT_CR
+       for (.member(Agent, UniqueAgents)) {
+           // Calculate average IT rating for this agent
+           .findall(Rating, interaction_trust(acting_agent, Agent, _, Rating), ITRatings);
+           .length(ITRatings, NumITRatings);
+           
+           if (NumITRatings > 0) {
+               // Calculate sum of IT ratings
+               +it_total(0);
+               for (.member(R, ITRatings)) {
+                   ?it_total(Current);
+                   -+it_total(Current + R);
+               }
+               ?it_total(ITTotal);
+               -it_total(_);
+               
+               IT_AVG = ITTotal / NumITRatings;
+               
+               // Calculate average CR rating for this agent
+               .findall(CRR, certified_reputation(_, Agent, _, CRR), CRRatings);
+               .length(CRRatings, NumCRRatings);
+               
+               if (NumCRRatings > 0) {
+                   // Calculate sum of CR ratings
+                   +cr_total(0);
+                   for (.member(CR, CRRatings)) {
+                       ?cr_total(CurrentCR);
+                       -+cr_total(CurrentCR + CR);
+                   }
+                   ?cr_total(CRTotal);
+                   -cr_total(_);
+                   
+                   CRRating = CRTotal / NumCRRatings;
+               } else {
+                   // If no CR ratings, use neutral value (0)
+                   CRRating = 0;
+               }
+               
+               // Calculate combined IT_CR rating using the formula:
+               IT_CR = 0.5 * IT_AVG + 0.5 * CRRating;
+               
+               .print("Agent ", Agent, " - IT_AVG: ", IT_AVG, ", CRRating: ", CRRating, ", IT_CR: ", IT_CR);
+               
+               // Check if this agent has the best combined rating so far
+               ?best_agent(_, BestRating);
+               if (IT_CR > BestRating) {
+                   -best_agent(_, _);
+                   +best_agent(Agent, IT_CR);
+                   .print("New best agent: ", Agent, " with IT_CR: ", IT_CR);
+               }
+           }
+       }
+       
+       ?best_agent(BestAgent, BestRating);
+       
+       if (BestAgent \== none) {
+           .print("Agent with highest IT_CR rating: ", BestAgent, " (", BestRating, ")");
+           
+           .findall(Agent, available_reading(Agent, _), OrderedAgents);
+           .length(OrderedAgents, NumAgents);
+           
+           +agent_index(0);
+           for (.range(I, 0, NumAgents-1)) {
+               .nth(I, OrderedAgents, CurrentAgent);
+               if (CurrentAgent == BestAgent) {
+                   -+agent_index(I);
+                   .print("Found best agent ", BestAgent, " at index ", I);
+               }
+           }
+           
+           ?agent_index(Index);
+           .nth(Index, TempReadings, Celsius);
+           .print("Selected temperature ", Celsius, " from best agent ", BestAgent);
+       } else {
+           .nth(0, TempReadings, Celsius);
+           .print("No best agent found, defaulting to first temperature: ", Celsius);
+       }
+       
+       -best_agent(_, _);
+       -agent_index(_);
+    .
+
 /* 
  * Plan for reacting to the addition of the goal !manifest_temperature
  * Triggering event: addition of goal !manifest_temperature

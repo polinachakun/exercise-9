@@ -79,6 +79,28 @@ i_have_plans_for(R) :- not (role_goal(R,G) & not has_plan_for(G)).
         };
     .
 
+@respond_to_reputation_request_plan
++?certified_reputation(CertificationAgent, TargetAgent, MessageContent, CRRating)
+    : true
+    <- .findall(certified_reputation(CA, TA, MC, CR), 
+               certified_reputation(CA, TA, MC, CR), 
+               AllCRs);
+       
+       .print("Responding to reputation request with: ", AllCRs);
+       
+       // If the agent has no reputation ratings, respond with an empty list
+       if (.empty(AllCRs)) {
+           +certified_reputation(none, none, none, 0);
+           .findall(certified_reputation(CA, TA, MC, CR), 
+                   certified_reputation(CA, TA, MC, CR), 
+                   UpdatedCRs);
+           -certified_reputation(none, none, none, 0);
+           .send(acting_agent, tell, UpdatedCRs);
+       } else {
+           .send(acting_agent, tell, AllCRs);
+       }
+    .
+
 /* 
  * Plan for reacting to the addition of the certified_reputation(CertificationAgent, SourceAgent, MessageContent, CRRating)
  * Triggering event: addition of belief certified_reputation(CertificationAgent, SourceAgent, MessageContent, CRRating)
