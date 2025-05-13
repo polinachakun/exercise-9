@@ -100,7 +100,7 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
 @select_reading_task_1_plan
 +!select_reading(TempReadings, Celsius)
     : true
-       .findall(Agent, interaction_trust(acting_agent, Agent, _, _), AllAgents);
+     <- .findall(Agent, interaction_trust(acting_agent, Agent, _, _), AllAgents);
        .sort(AllAgents, SortedAgents);
        .union(SortedAgents, [], UniqueAgents);
        
